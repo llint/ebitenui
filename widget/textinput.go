@@ -50,8 +50,9 @@ type TextInput struct {
 }
 
 type TextInputEnable func(enable bool)
+type TextInputClear func()
 
-type TextInputEnterFunc func(text string, enable TextInputEnable)
+type TextInputEnterFunc func(text string, enable TextInputEnable, clear TextInputClear)
 
 type TextInputOpt func(t *TextInput)
 
@@ -417,9 +418,14 @@ func (t *TextInput) doDelete() {
 
 func (t *TextInput) doEnter() {
 	if t.enterFunc != nil && !t.widget.Disabled {
-		t.enterFunc(t.InputText, func(enable bool) {
-			t.widget.Disabled = !enable
-		})
+		t.enterFunc(t.InputText,
+			func(enable bool) {
+				t.widget.Disabled = !enable
+			},
+			func() {
+				t.InputText = ""
+			},
+		)
 	}
 }
 
